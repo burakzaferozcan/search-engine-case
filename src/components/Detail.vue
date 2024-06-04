@@ -75,7 +75,7 @@ export default {
       }
     },
     async shortenUrl(url) {
-      const apiKey = import.meta.env.VITE_TINYURL_API_KEY; // API anahtarını .env dosyasından al
+      const apiKey = import.meta.env.VITE_TINYURL_API_KEY;
       const apiEndpoint = `https://tinyurl.com/api-create.php?url=${encodeURIComponent(
         url
       )}&apikey=${apiKey}`;

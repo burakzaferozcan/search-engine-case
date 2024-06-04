@@ -101,6 +101,7 @@ export default {
 .links {
   display: flex;
   justify-content: space-between;
+  align-items: center;
 }
 .a {
   padding: 10px 15px;
