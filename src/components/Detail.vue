@@ -1,17 +1,17 @@
 <template>
   <div class="detail-container" v-if="detailItem">
-    <h2>Detay Bilgileri</h2>
-    <p>Ad Soyad: {{ detailItem.nameSurname }}</p>
-    <p>Şirket: {{ detailItem.company }}</p>
-    <p>E-posta: {{ detailItem.email }}</p>
-    <p>Telefon: {{ detailItem.phone }}</p>
+    <h2>Details</h2>
+    <p>Name Surname: {{ detailItem.nameSurname }}</p>
+    <p>Company: {{ detailItem.company }}</p>
+    <p>Email: {{ detailItem.email }}</p>
+    <p>Phone: {{ detailItem.phone }}</p>
     <p>
-      Web Sitesi:
+      WebSite:
       <a :href="detailItem.website" target="_blank">{{ detailItem.website }}</a>
     </p>
-    <p>Ülke: {{ detailItem.country }}</p>
-    <p>Şehir: {{ detailItem.city }}</p>
-    <p>Tarih: {{ detailItem.date }}</p>
+    <p>Country: {{ detailItem.country }}</p>
+    <p>City: {{ detailItem.city }}</p>
+    <p>Date: {{ detailItem.date }}</p>
   </div>
   <div v-else>
     <p>Veri bulunamadı.</p>

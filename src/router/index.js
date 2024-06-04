@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import Search from "../components/Search.vue";
 import Detail from "../components/Detail.vue";
 import AddRecord from "../components/AddRecord.vue";
+import SearchResults from "../components/SearchResults.vue";
 const routes = [
   {
     path: "/",
@@ -18,6 +19,11 @@ const routes = [
     path: "/add-record",
     name: "AddRecord",
     component: AddRecord,
+  },
+  {
+    path: "/results",
+    name: "SearchResults",
+    component: SearchResults,
   },
 ];
 

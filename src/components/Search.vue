@@ -1,27 +1,38 @@
 <template>
   <div class="search-container">
-    <input
-      type="text"
-      v-model="searchTerm"
-      placeholder="Ara..."
-      @input="search"
-    />
-    <button @click="goToAddRecord">Yeni Kayıt Ekle</button>
+    <div class="addNewRecordDiv">
+      <button class="addNewRecord" @click="goToAddRecord">
+        Add New Record
+      </button>
+    </div>
+    <div class="searchBarComp">
+      <h1>TESODEV SEARCH APP</h1>
+      <div>
+        <h3>Find in records</h3>
+        <input
+          type="text"
+          v-model="searchTerm"
+          placeholder="Ara..."
+          @input="search"
+        />
+      </div>
+    </div>
+    <div v-if="searchResults.length > 3 && !showAll"></div>
     <div v-if="searchResults.length > 3 && showAll" class="pagination">
       <select v-model="sortOption" @change="sortResults" class="sort-select">
         <option value="name">İsme Göre Sırala</option>
         <option value="date">Tarihe Göre Sırala</option>
       </select>
     </div>
-    <table v-if="searchResults.length > 0" class="search-results">
+    <table v-if="searchResults.length > 0 && !showAll" class="search-results">
       <thead>
         <tr>
-          <th @click="sortResults('name')">Ad Soyad</th>
-          <th>Şirket</th>
-          <th>E-posta</th>
-          <th>Telefon</th>
-          <th @click="sortResults('date')">Tarih</th>
-          <th>Detay</th>
+          <th @click="sortResults('name')">Name Surname</th>
+          <th>Company</th>
+          <th>Email</th>
+          <th>phone</th>
+          <th @click="sortResults('date')">Date</th>
+          <th>Detail</th>
         </tr>
       </thead>
       <tbody>
@@ -31,22 +42,13 @@
           <td>{{ item.email }}</td>
           <td>{{ item.phone }}</td>
           <td>{{ item.date }}</td>
-          <td><button @click="showDetail(item.id)">Detay</button></td>
+          <td><button @click="showDetail(item.id)">Detail</button></td>
         </tr>
       </tbody>
     </table>
-    <div v-if="searchResults.length > 3 && !showAll">
-      <button @click="showMore">Daha Fazla Göster</button>
-    </div>
-    <div v-if="searchResults.length > 3 && showAll" class="pagination">
-      <button @click="previousPage" :disabled="currentPage === 1">
-        Önceki
-      </button>
-      <span>Sayfa {{ currentPage }} / {{ totalPages }}</span>
-      <button @click="nextPage" :disabled="currentPage === totalPages">
-        Sonraki
-      </button>
-    </div>
+    <button @click="showMore" v-if="searchResults.length >= 3">
+      Show More
+    </button>
   </div>
 </template>
 
@@ -61,15 +63,10 @@ export default {
       displayedResults: [],
       data: [],
       currentPage: 1,
-      resultsPerPage: 10,
+      resultsPerPage: 3,
       showAll: false,
       sortOption: null,
     };
-  },
-  computed: {
-    totalPages() {
-      return Math.ceil(this.searchResults.length / this.resultsPerPage);
-    },
   },
   mounted() {
     this.data = this.processMockData(mockData);
@@ -109,19 +106,8 @@ export default {
       }
     },
     showMore() {
-      this.showAll = true;
-      this.updateDisplayedResults();
-    },
-    nextPage() {
-      this.currentPage++;
-      this.updateDisplayedResults();
-    },
-    previousPage() {
-      this.currentPage--;
-      this.updateDisplayedResults();
-    },
-    showDetail(id) {
-      this.$router.push({ name: "Detail", params: { id: id } });
+      localStorage.setItem("searchResults", JSON.stringify(this.searchResults));
+      this.$router.push({ name: "SearchResults" });
     },
     sortResults() {
       if (this.sortOption === "name") {
@@ -136,6 +122,9 @@ export default {
     goToAddRecord() {
       this.$router.push({ name: "AddRecord" });
     },
+    showDetail(id) {
+      this.$router.push({ name: "Detail", params: { id: id } });
+    },
   },
 };
 </script>
@@ -143,28 +132,83 @@ export default {
 <style scoped>
 .search-container {
   text-align: center;
+  margin: 20px;
 }
+
+.search-container input[type="text"] {
+  padding: 10px;
+  width: 300px;
+  margin-right: 10px;
+}
+
+.search-container button {
+  padding: 10px 20px;
+  background-color: #182767;
+  color: white;
+  border: none;
+  cursor: pointer;
+  margin: 10px 0;
+  transition: all 0.3s;
+  border-radius: 15px;
+}
+
+.search-container button:hover {
+  background-color: #23399a;
+}
+
+.sort-select {
+  margin-left: 10px;
+}
+
 .search-results {
-  margin: 0 auto;
+  margin: 20px auto;
   width: 80%;
   border-collapse: collapse;
 }
+
 .search-results th,
 .search-results td {
   border: 1px solid #ddd;
   padding: 8px;
 }
+
 .search-results th {
   padding-top: 12px;
   padding-bottom: 12px;
-  background-color: #4caf50;
+  background-color: #182767;
   color: white;
   cursor: pointer;
 }
-.pagination {
-  margin-top: 20px;
+
+.search-results td button {
+  padding: 5px 10px;
+  background-color: #182767;
+  color: white;
+  border: none;
+  cursor: pointer;
 }
-.sort-select {
-  margin-left: 10px;
+
+.search-results td button:hover {
+  background-color: #23399a;
+}
+
+.addNewRecordDiv {
+  display: flex;
+  width: 100%;
+  justify-content: end;
+}
+.searchBarComp {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.searchBarComp div {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+}
+.searchBarComp h1 {
+  color: #182767;
 }
 </style>
