@@ -32,6 +32,7 @@
 <script>
 import { v4 as uuidv4 } from "uuid";
 import { useToast } from "vue-toast-notification";
+
 export default {
   data() {
     return {
@@ -139,11 +140,22 @@ export default {
         ...this.formData,
         date: this.getCurrentDate(),
       };
-      const storedRecords = JSON.parse(localStorage.getItem("records")) || [];
-      storedRecords.push(newRecord);
-      localStorage.setItem("records", JSON.stringify(storedRecords));
-      this.showToast();
-      this.$router.push({ name: "Search" });
+
+      this.shortenUrl(this.formData.website)
+        .then((shortUrl) => {
+          if (shortUrl) {
+            newRecord.website = shortUrl;
+            const storedRecords =
+              JSON.parse(localStorage.getItem("records")) || [];
+            storedRecords.push(newRecord);
+            localStorage.setItem("records", JSON.stringify(storedRecords));
+            this.showToast();
+            this.$router.push({ name: "Search" });
+          }
+        })
+        .catch((error) => {
+          console.error("URL kısaltma hatası:", error);
+        });
     },
     showToast() {
       const toast = useToast();
@@ -157,14 +169,29 @@ export default {
 
       return `${day}.${month}.${year}`;
     },
+    async shortenUrl(url) {
+      const apiKey = import.meta.env.VITE_TINYURL_API_KEY;
+      const apiEndpoint = `https://tinyurl.com/api-create.php?url=${encodeURIComponent(
+        url
+      )}&apikey=${apiKey}`;
+      try {
+        const response = await fetch(apiEndpoint);
+        if (response.ok) {
+          const shortUrl = await response.text();
+          return shortUrl;
+        } else {
+          throw new Error("API isteği başarısız oldu.");
+        }
+      } catch (error) {
+        console.error("URL kısaltma hatası:", error);
+        return null;
+      }
+    },
   },
 };
 </script>
 
-<style scoped>
-.container {
-  width: 100vw;
-}
+<style>
 .a {
   margin: 20px 0 0 20px;
   display: flex;
@@ -181,62 +208,61 @@ export default {
 .a:hover {
   background-color: #23399a;
 }
-.inputContainer {
-  display: flex;
-  flex-direction: column;
-}
-.add-record-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-.add-record-container h2 {
-  margin-left: 20px;
-  margin-bottom: 20px;
-}
-.add-record-container form {
-  width: 50%;
-}
-.add-record-container form div {
-  margin-bottom: 10px;
+.container {
+  max-width: 600px;
+  margin: auto;
+  padding: 20px;
 }
 
-.add-record-container form input {
-  border-radius: 10px;
-  border: 1px solid #ccc;
+.add-record-container {
+  background: #f9f9f9;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.inputContainer {
+  margin-bottom: 15px;
+}
+
+.inputContainer label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.inputContainer input {
   width: 100%;
-  padding: 8px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.inputContainer input.inputError {
+  border-color: red;
+}
+
+.error {
+  color: red;
+  font-size: 12px;
   margin-top: 5px;
 }
-.add-record-container form button {
-  padding: 10px 20px;
+
+button {
   background-color: #182767;
   color: white;
   border: none;
+  padding: 10px 20px;
   cursor: pointer;
-  border-radius: 15px;
-  transition: all 0.3s;
+  border-radius: 4px;
 }
-.add-record-container form button:hover {
+
+button:hover {
   background-color: #23399a;
 }
-.add-record-container form button:disabled {
-  background-color: #ccc;
+
+button:disabled {
+  background: #ccc;
   cursor: not-allowed;
-}
-.error {
-  color: red;
-  font-size: 14px;
-  margin-top: 5px;
-}
-.inputError:focus {
-  outline: none !important;
-  border: 1px solid red;
-  color: red;
-}
-.inputError {
-  outline: none !important;
-  border: 1px solid red;
-  color: red;
 }
 </style>
